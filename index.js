@@ -1,14 +1,5 @@
 console.log('The Master is listening through the void'); 
 
-//bot token 
-//MTIzNjc5MDIyNjk3NDgwMTk1MA.GyZXkJ.K4mzpQNqYnhlsjR-gfmo10z5YJsDvBTSFiJzPc
-
-//bot client 
-//id1236790226974801950
-
-//discordjs app id to add the bot to a server
-//https://discord.com/api/oauth2/authorize?client_id=1236790226974801950&permissions=0&scope=bot%20applications.commands
-
 const fs = require('node:fs');
 const path = require('node:path');
 // Require the necessary discord.js classes
