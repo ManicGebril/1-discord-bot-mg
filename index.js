@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token, serverId, channelId } = require('./config.json');
+const { token, guildId, channelId } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -12,10 +12,10 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // When the client is ready, run this code (only once).
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-	console.log(`Server ID: ${serverId}`);
+	console.log(`Server ID: ${guildId}`);
 	console.log(`Connected Guilds: ${client.guilds.cache.map(guild => guild.name).join(', ')}`);
     // Find the server and channel by their IDs
-    const server = readyClient.guilds.cache.get(serverId);
+    const server = readyClient.guilds.cache.get(guildId);
     const channel = server.channels.cache.find(channel => channel.type === 'text' && channel.name === 'general');
 		if (channel) {
    	 		channel.send('I have returned from slumber to serve you.');
