@@ -12,13 +12,20 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // When the client is ready, run this code (only once).
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-
+	console.log(`Server ID: ${serverId}`);
+	console.log(`Connected Guilds: ${client.guilds.cache.map(guild => guild.name).join(', ')}`);
     // Find the server and channel by their IDs
     const server = readyClient.guilds.cache.get(serverId);
-    const channel = server.channels.cache.get(channelId);
+    const channel = server.channels.cache.find(channel => channel.type === 'text' && channel.name === 'general');
+		if (channel) {
+   	 		channel.send('I have returned from slumber to serve you.');
+		} else {
+    		console.error('Unable to find a suitable channel to send messages.');
+		}
+	//const channel = server.channels.cache.get(channelId);
 
     // Send a message to the designated channel
-    channel.send('I have returned from slumber to server you.');
+    //channel.send('I have returned from slumber to server you.');
 });
 
 // Log in to Discord with your client's token
