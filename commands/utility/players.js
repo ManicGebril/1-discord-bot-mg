@@ -7,7 +7,7 @@ module.exports = {
     },
     async execute(interaction) {
         try {
-            const data = fs.readFileSync('serverLog.json', 'utf8');
+            const data = fs.readFileSync('/home/matalasg/serverLog.json', 'utf8');
             const serverStatus = JSON.parse(data);
             const players = serverStatus.players.join(', ');
             await interaction.reply(`Currently connected players: ${players}`);
