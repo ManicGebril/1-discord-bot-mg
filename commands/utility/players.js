@@ -20,7 +20,10 @@ function getConnectedPlayers(serverStatus) {
     const logoutPlayers = getLogoutPlayers(serverStatus);
     
     // Filter out players who have logged in but not logged out yet
-    return loginPlayers.filter(player => !logoutPlayers.includes(player));
+    const connectedPlayers = loginPlayers.filter(player => !logoutPlayers.includes(player));
+
+    // Ensure unique player names
+    return [...new Set(connectedPlayers)];
 }
 
 module.exports = {
