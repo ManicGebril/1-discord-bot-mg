@@ -8,19 +8,16 @@ module.exports = {
     async execute(interaction) {
         try {
             const data = fs.readFileSync('/home/matalasg/serverLog.json', 'utf8');
+            console.log('Raw data from serverLog.json:', data); // Add this line to log raw data
             const serverStatus = JSON.parse(data);
-
-            // Log the value of serverStatus.players
-            console.log('Server Status Players:', serverStatus.players);
-
-            // Check if serverStatus.players is defined and is an array
-            if (Array.isArray(serverStatus.players)) {
-                const players = serverStatus.players.join(', ');
-                await interaction.reply(`Currently connected players: ${players}`);
-            } else {
-                console.error('serverStatus.players is not an array or is undefined.');
-                await interaction.reply('Error reading server log data.');
+            console.log('Parsed server status:', serverStatus); // Add this line to log parsed server status
+            const players = serverStatus.players;
+            console.log('Server Status Players:', players); // Add this line to log server players
+            if (!Array.isArray(players)) {
+                throw new Error('Server Status Players is not an array or is undefined.');
             }
+            const playerNames = players.join(', ');
+            await interaction.reply(`Currently connected players: ${playerNames}`);
         } catch (error) {
             console.error('Error reading server log data:', error);
             await interaction.reply('Error reading server log data.');
