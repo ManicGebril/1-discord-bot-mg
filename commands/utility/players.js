@@ -1,6 +1,5 @@
 const fs = require('fs');
 
-// Function to determine currently connected players
 function getConnectedPlayers(serverStatus) {
     const connectedPlayers = new Map();
 
@@ -21,10 +20,9 @@ function getConnectedPlayers(serverStatus) {
                     console.log(`Player ${playerName} already logged in with zdo_id ${zdoId}, ignoring zdo_id ${zdoId}`);
                 }
             }
-        } else if (entry.event === 'player_disconnect' && entry.zdo_id && connectedPlayers.has(entry.player_name)) {
+        } else if (entry.event === 'player_disconnect' && entry.zdo_id) {
             const playerName = entry.player_name;
-            const playerZdoId = connectedPlayers.get(playerName);
-            if (playerZdoId === entry.zdo_id) {
+            if (connectedPlayers.has(playerName)) {
                 connectedPlayers.delete(playerName); // Remove player from connected players
                 console.log(`Player ${playerName} disconnected with zdo_id ${entry.zdo_id}`);
             } else {
