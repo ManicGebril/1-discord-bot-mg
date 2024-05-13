@@ -13,7 +13,13 @@ function getConnectedPlayers(serverStatus) {
                 connectedPlayers.set(playerName, zdoId); // Add player to connected players with zdo_id
                 console.log(`Player ${playerName} logged in with zdo_id ${zdoId}`);
             } else {
-                console.log(`Player ${playerName} already logged in with zdo_id ${connectedPlayers.get(playerName)}, ignoring zdo_id ${zdoId}`);
+                const currentZdoId = connectedPlayers.get(playerName);
+                if (zdoId !== currentZdoId) {
+                    console.log(`Player ${playerName} already logged in with zdo_id ${currentZdoId}, replacing with zdo_id ${zdoId}`);
+                    connectedPlayers.set(playerName, zdoId); // Update player's zdo_id
+                } else {
+                    console.log(`Player ${playerName} already logged in with zdo_id ${zdoId}, ignoring zdo_id ${zdoId}`);
+                }
             }
         } else if (entry.event === 'player_disconnect' && entry.zdo_id && connectedPlayers.has(entry.player_name)) {
             const playerName = entry.player_name;
@@ -29,6 +35,7 @@ function getConnectedPlayers(serverStatus) {
 
     return Array.from(connectedPlayers.values()); // Return only the zdo_ids of connected players
 }
+
 
 module.exports = {
     data: {
