@@ -36,7 +36,6 @@ function getConnectedPlayers(serverStatus) {
     return Array.from(connectedPlayers.values()); // Return only the zdo_ids of connected players
 }
 
-
 module.exports = {
     data: {
         name: 'players',
