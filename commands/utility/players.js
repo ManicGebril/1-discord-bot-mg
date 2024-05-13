@@ -22,13 +22,16 @@ function getConnectedPlayers(serverStatus) {
     serverStatus.forEach(entry => {
         if (entry.event === 'player_login') {
             connectedPlayers.add(entry.player_name); // Add player to connected players when they log in
+            console.log(`Player ${entry.player_name} logged in`);
         } else if (entry.event === 'player_disconnect') {
             connectedPlayers.delete(entry.player_name); // Remove player from connected players when they disconnect
+            console.log(`Player ${entry.player_name} disconnected`);
         }
     });
 
     return Array.from(connectedPlayers);
 }
+
 
 
 module.exports = {
