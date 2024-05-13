@@ -1,5 +1,26 @@
 const fs = require('fs');
 
+// Function to extract login players from server status data
+function getLoginPlayers(serverStatus) {
+    return serverStatus
+        .filter(entry => entry.event === 'player_login')
+        .map(entry => entry.player_name);
+}
+
+// Function to extract logout players from server status data
+function getLogoutPlayers(serverStatus) {
+    return serverStatus
+        .filter(entry => entry.event === 'player_disconnect')
+        .map(entry => entry.player_name);
+}
+
+// Function to determine currently connected players
+function getConnectedPlayers(serverStatus) {
+    const loginPlayers = getLoginPlayers(serverStatus);
+    const logoutPlayers = getLogoutPlayers(serverStatus);
+    return [...new Set([...loginPlayers, ...logoutPlayers])];
+}
+
 module.exports = {
     data: {
         name: 'players',
@@ -12,19 +33,15 @@ module.exports = {
             const serverStatus = JSON.parse(data);
             console.log('Parsed server status:', serverStatus); // log parsed server status
             
-            // Extract player names from login events
-            const loginPlayers = serverStatus.filter(entry => entry.event === 'player_login').map(entry => entry.player_name);
-            console.log('Login Players:', loginPlayers); // log login players
-
-            // Extract player names from logout events
-            const logoutPlayers = serverStatus.filter(entry => entry.event === 'player_disconnect').map(entry => entry.player_name);
-            console.log('Logout Players:', logoutPlayers); // log logout players
-
-            // Combine login and logout players to get currently connected players
-            const connectedPlayers = [...new Set([...loginPlayers, ...logoutPlayers])];
+            // Get currently connected players
+            const connectedPlayers = getConnectedPlayers(serverStatus);
             console.log('Connected Players:', connectedPlayers); // log connected players
 
-            await interaction.reply(`Currently connected players: ${connectedPlayers.join(', ')}`);
+            if (connectedPlayers.length === 0) {
+                await interaction.reply('There are no players currently connected.');
+            } else {
+                await interaction.reply(`Currently connected players: ${connectedPlayers.join(', ')}`);
+            }
         } catch (error) {
             console.error('Error reading server log data:', error);
             await interaction.reply('Error reading server log data.');
