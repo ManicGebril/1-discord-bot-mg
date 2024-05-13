@@ -17,6 +17,15 @@ function getConnectedPlayers(serverStatus) {
                 connectedPlayers.set(playerName, entry.zdo_id); // Update zdo_id for player previously logged with zdo_id:0
                 console.log(`Player ${playerName} logged in with zdo_id ${entry.zdo_id}`);
             }
+        } else if (entry.event === 'player_disconnect' && entry.zdo_id && connectedPlayers.has(entry.player_name)) {
+            const playerName = entry.player_name;
+            const playerZdoId = connectedPlayers.get(playerName);
+            if (playerZdoId === entry.zdo_id) {
+                connectedPlayers.delete(playerName); // Remove player from connected players
+                console.log(`Player ${playerName} disconnected with zdo_id ${entry.zdo_id}`);
+            } else {
+                console.log(`Player ${playerName} disconnected with zdo_id ${entry.zdo_id}, but was not logged in previously with this zdo_id`);
+            }
         }
     });
 
