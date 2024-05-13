@@ -16,30 +16,29 @@ function getLogoutPlayers(serverStatus) {
 
 // Function to determine currently connected players
 function getConnectedPlayers(serverStatus) {
-    const loginPlayers = getLoginPlayers(serverStatus);
-    const logoutPlayers = getLogoutPlayers(serverStatus);
+    // Create maps to store the latest login and logout events for each player
+    const latestLogin = new Map();
+    const latestLogout = new Map();
 
-    // Create a map to store the login status for each player
-    const playerStatus = new Map();
-
-    // Iterate through server status to update player status
+    // Iterate through server status to update latest login and logout events
     serverStatus.forEach(entry => {
         if (entry.event === 'player_login') {
-            playerStatus.set(entry.player_name, true); // Set login status to true
+            latestLogin.set(entry.player_name, entry.timestamp); // Update latest login event
         } else if (entry.event === 'player_disconnect') {
-            playerStatus.set(entry.zdo_id, false); // Set login status to false
+            latestLogout.set(entry.zdo_id, entry.timestamp); // Update latest logout event
         }
     });
 
-    // Filter out players who have logged in but not logged out yet
-    const connectedPlayers = loginPlayers.filter(player => {
-        return playerStatus.get(player) === true; // Check if the player has a login status of true
+    // Filter out players who have a login event after their latest logout event
+    const connectedPlayers = [];
+    latestLogin.forEach((loginTime, player) => {
+        if (!latestLogout.has(player) || latestLogout.get(player) < loginTime) {
+            connectedPlayers.push(player);
+        }
     });
 
-    // Ensure unique player names
-    return [...new Set(connectedPlayers)];
+    return connectedPlayers;
 }
-
 
 module.exports = {
     data: {
