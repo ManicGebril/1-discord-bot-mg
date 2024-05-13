@@ -16,21 +16,26 @@ function getLogoutPlayers(serverStatus) {
 
 // Function to determine currently connected players
 function getConnectedPlayers(serverStatus) {
-    const connectedPlayers = new Set();
+    const connectedPlayers = new Map();
 
     // Iterate through server status to track player's online status
     serverStatus.forEach(entry => {
-        if (entry.event === 'player_login' && entry.player_name) {
-            connectedPlayers.add(entry.player_name); // Add player to connected players when they log in
-            console.log(`Player ${entry.player_name} logged in`);
-        } else if (entry.event === 'player_disconnect' && entry.player_name) {
-            connectedPlayers.delete(entry.player_name); // Remove player from connected players when they disconnect
-            console.log(`Player ${entry.player_name} disconnected`);
+        if (entry.event === 'player_login' && entry.zdo_id) {
+            connectedPlayers.set(entry.zdo_id, entry.timestamp); // Add player to connected players with login timestamp
+            console.log(`Player with zdo_id ${entry.zdo_id} logged in`);
+        } else if (entry.event === 'player_disconnect' && entry.zdo_id) {
+            if (connectedPlayers.has(entry.zdo_id)) {
+                connectedPlayers.delete(entry.zdo_id); // Remove player from connected players
+                console.log(`Player with zdo_id ${entry.zdo_id} disconnected`);
+            } else {
+                console.log(`Player with zdo_id ${entry.zdo_id} disconnected, but was not logged in previously`);
+            }
         }
     });
 
-    return Array.from(connectedPlayers);
+    return Array.from(connectedPlayers.values());
 }
+
 
 module.exports = {
     data: {
