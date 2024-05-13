@@ -20,10 +20,10 @@ function getConnectedPlayers(serverStatus) {
 
     // Iterate through server status to track player's online status
     serverStatus.forEach(entry => {
-        if (entry.event === 'player_login') {
+        if (entry.event === 'player_login' && entry.player_name) {
             connectedPlayers.add(entry.player_name); // Add player to connected players when they log in
             console.log(`Player ${entry.player_name} logged in`);
-        } else if (entry.event === 'player_disconnect') {
+        } else if (entry.event === 'player_disconnect' && entry.player_name) {
             connectedPlayers.delete(entry.player_name); // Remove player from connected players when they disconnect
             console.log(`Player ${entry.player_name} disconnected`);
         }
@@ -31,8 +31,6 @@ function getConnectedPlayers(serverStatus) {
 
     return Array.from(connectedPlayers);
 }
-
-
 
 module.exports = {
     data: {
