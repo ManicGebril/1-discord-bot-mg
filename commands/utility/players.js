@@ -1,37 +1,40 @@
 const fs = require('fs');
 
 function getConnectedPlayers(serverStatus) {
-    const connectedPlayers = new Map();
+    const connectedPlayers = [];
 
     // Iterate through server status to track player's online status
     serverStatus.forEach(entry => {
         if (entry.event === 'player_login' && entry.zdo_id && entry.zdo_id !== '0') {
             const playerName = entry.player_name;
             const zdoId = entry.zdo_id;
-            if (!connectedPlayers.has(playerName)) {
-                connectedPlayers.set(playerName, zdoId); // Add player to connected players with zdo_id
+            const existingPlayerIndex = connectedPlayers.findIndex(player => player.name === playerName);
+            if (existingPlayerIndex === -1) {
+                connectedPlayers.push({ name: playerName, zdo_id: zdoId }); // Add player to connected players with zdo_id
                 console.log(`Player ${playerName} logged in with zdo_id ${zdoId}`);
             } else {
-                const currentZdoId = connectedPlayers.get(playerName);
+                const currentZdoId = connectedPlayers[existingPlayerIndex].zdo_id;
                 if (zdoId !== currentZdoId) {
                     console.log(`Player ${playerName} already logged in with zdo_id ${currentZdoId}, replacing with zdo_id ${zdoId}`);
-                    connectedPlayers.set(playerName, zdoId); // Update player's zdo_id
+                    connectedPlayers[existingPlayerIndex].zdo_id = zdoId; // Update player's zdo_id
                 } else {
                     console.log(`Player ${playerName} already logged in with zdo_id ${zdoId}, ignoring zdo_id ${zdoId}`);
                 }
             }
         } else if (entry.event === 'player_disconnect' && entry.zdo_id && entry.player_name) {
             const playerName = entry.player_name;
-            if (connectedPlayers.has(playerName)) {
-                connectedPlayers.delete(playerName); // Remove player from connected players
-                console.log(`Player ${playerName} disconnected with zdo_id ${entry.zdo_id}`);
+            const disconnectedZdoId = entry.zdo_id;
+            const disconnectedPlayerIndex = connectedPlayers.findIndex(player => player.name === playerName && player.zdo_id === disconnectedZdoId);
+            if (disconnectedPlayerIndex !== -1) {
+                connectedPlayers.splice(disconnectedPlayerIndex, 1); // Remove player from connected players
+                console.log(`Player ${playerName} disconnected with zdo_id ${disconnectedZdoId}`);
             } else {
-                console.log(`Player ${playerName} disconnected with zdo_id ${entry.zdo_id}, but was not logged in previously with this zdo_id`);
+                console.log(`Player ${playerName} disconnected with zdo_id ${disconnectedZdoId}, but was not logged in previously with this zdo_id`);
             }
         }
     });
 
-    return Array.from(connectedPlayers.values()); // Return only the zdo_ids of connected players
+    return connectedPlayers.map(player => player.zdo_id); // Return only the zdo_ids of connected players
 }
 
 module.exports = {
