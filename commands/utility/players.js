@@ -20,7 +20,7 @@ function getConnectedPlayers(serverStatus) {
                     console.log(`Player ${playerName} already logged in with zdo_id ${zdoId}, ignoring zdo_id ${zdoId}`);
                 }
             }
-        } else if (entry.event === 'player_disconnect' && entry.zdo_id) {
+        } else if (entry.event === 'player_disconnect' && entry.zdo_id && entry.player_name) {
             const playerName = entry.player_name;
             if (connectedPlayers.has(playerName)) {
                 connectedPlayers.delete(playerName); // Remove player from connected players
