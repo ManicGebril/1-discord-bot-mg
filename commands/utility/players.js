@@ -18,13 +18,29 @@ function getLogoutPlayers(serverStatus) {
 function getConnectedPlayers(serverStatus) {
     const loginPlayers = getLoginPlayers(serverStatus);
     const logoutPlayers = getLogoutPlayers(serverStatus);
-    
+
+    // Create a map to store the latest login timestamp for each player
+    const latestLogins = new Map();
+
+    // Iterate through login events to find the latest login for each player
+    serverStatus.forEach(entry => {
+        if (entry.event === 'player_login') {
+            // Update the latest login timestamp for the player
+            latestLogins.set(entry.player_name, entry.timestamp);
+        }
+    });
+
     // Filter out players who have logged in but not logged out yet
-    const connectedPlayers = loginPlayers.filter(player => !logoutPlayers.includes(player));
+    const connectedPlayers = loginPlayers.filter(player => {
+        const latestLoginTimestamp = latestLogins.get(player);
+        // Check if the player has not logged out and their latest login timestamp matches the latest in the map
+        return !logoutPlayers.includes(player) && serverStatus.some(entry => entry.player_name === player && entry.timestamp === latestLoginTimestamp);
+    });
 
     // Ensure unique player names
     return [...new Set(connectedPlayers)];
 }
+
 
 module.exports = {
     data: {
