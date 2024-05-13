@@ -1,39 +1,26 @@
 const fs = require('fs');
 
-// Function to extract login players from server status data
-function getLoginPlayers(serverStatus) {
-    return serverStatus
-        .filter(entry => entry.event === 'player_login')
-        .map(entry => entry.player_name);
-}
-
-// Function to extract logout players from server status data
-function getLogoutPlayers(serverStatus) {
-    return serverStatus
-        .filter(entry => entry.event === 'player_disconnect')
-        .map(entry => entry.player_name);
-}
-
 // Function to determine currently connected players
 function getConnectedPlayers(serverStatus) {
     const connectedPlayers = new Map();
 
     // Iterate through server status to track player's online status
     serverStatus.forEach(entry => {
-        if (entry.event === 'player_login' && entry.zdo_id) {
-            connectedPlayers.set(entry.zdo_id, entry.timestamp); // Add player to connected players with login timestamp
-            console.log(`Player with zdo_id ${entry.zdo_id} logged in`);
-        } else if (entry.event === 'player_disconnect' && entry.zdo_id) {
-            if (connectedPlayers.has(entry.zdo_id)) {
-                connectedPlayers.delete(entry.zdo_id); // Remove player from connected players
-                console.log(`Player with zdo_id ${entry.zdo_id} disconnected`);
+        if (entry.event === 'player_login' && entry.zdo_id && entry.zdo_id !== '0') {
+            const playerName = entry.player_name;
+            if (!connectedPlayers.has(playerName)) {
+                connectedPlayers.set(playerName, entry.zdo_id); // Add player to connected players with zdo_id
+                console.log(`Player ${playerName} logged in with zdo_id ${entry.zdo_id}`);
+            } else if (connectedPlayers.get(playerName) !== '0') {
+                console.log(`Player ${playerName} already logged in with zdo_id ${connectedPlayers.get(playerName)}, ignoring zdo_id ${entry.zdo_id}`);
             } else {
-                console.log(`Player with zdo_id ${entry.zdo_id} disconnected, but was not logged in previously`);
+                connectedPlayers.set(playerName, entry.zdo_id); // Update zdo_id for player previously logged with zdo_id:0
+                console.log(`Player ${playerName} logged in with zdo_id ${entry.zdo_id}`);
             }
         }
     });
 
-    return Array.from(connectedPlayers.keys()); // Return only the zdo_ids of connected players
+    return Array.from(connectedPlayers.values()); // Return only the zdo_ids of connected players
 }
 
 module.exports = {
