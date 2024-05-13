@@ -12,11 +12,19 @@ module.exports = {
             const serverStatus = JSON.parse(data);
             console.log('Parsed server status:', serverStatus); // log parsed server status
             
-            // Extract player names from each object in the serverStatus array
-            const playerNames = serverStatus.map(entry => entry.player_name);
-            console.log('Server Status Players:', playerNames); // log server players
+            // Extract player names from login events
+            const loginPlayers = serverStatus.filter(entry => entry.event === 'player_login').map(entry => entry.player_name);
+            console.log('Login Players:', loginPlayers); // log login players
 
-            await interaction.reply(`Currently connected players: ${playerNames.join(', ')}`);
+            // Extract player names from logout events
+            const logoutPlayers = serverStatus.filter(entry => entry.event === 'player_disconnect').map(entry => entry.player_name);
+            console.log('Logout Players:', logoutPlayers); // log logout players
+
+            // Combine login and logout players to get currently connected players
+            const connectedPlayers = [...new Set([...loginPlayers, ...logoutPlayers])];
+            console.log('Connected Players:', connectedPlayers); // log connected players
+
+            await interaction.reply(`Currently connected players: ${connectedPlayers.join(', ')}`);
         } catch (error) {
             console.error('Error reading server log data:', error);
             await interaction.reply('Error reading server log data.');
