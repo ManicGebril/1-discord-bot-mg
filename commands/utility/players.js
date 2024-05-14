@@ -14,7 +14,10 @@ function getConnectedPlayers(serverStatus) {
     return Array.from(connectedPlayers);
 }
 
-const serverLogPath = path.resolve(__dirname, '/home/matalasg/serverLog.json');
+// Export the getConnectedPlayers function
+module.exports = {
+    getConnectedPlayers: getConnectedPlayers
+};
 
 // Read server log data from JSON file
 fs.readFile(serverLogPath, 'utf8', (err, data) => {
