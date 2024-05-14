@@ -7,7 +7,7 @@ function getConnectedPlayers(serverStatus) {
     serverStatus.forEach(entry => {
         if (entry.event === 'player_login' && entry.zdo_id !== '0') {
             connectedPlayers.add(entry.zdo_id);
-        } else if (entry.event === 'player_disconnect' && entry.zdo_id && entry.player_name) {
+        } else if (entry.event === 'player_disconnect') {
             connectedPlayers.delete(entry.zdo_id);
         }
     });
