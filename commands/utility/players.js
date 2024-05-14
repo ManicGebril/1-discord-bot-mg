@@ -13,6 +13,11 @@ function getConnectedPlayers(serverStatus) {
     return Array.from(connectedPlayers);
 }
 
+// Export the getConnectedPlayers function
+module.exports = {
+    getConnectedPlayers: getConnectedPlayers
+};
+
 // Read server log data from JSON file
 fs.readFile('serverLog.json', 'utf8', (err, data) => {
     if (err) {
