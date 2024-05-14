@@ -10,7 +10,7 @@ const { getConnectedPlayers } = require('../commands/utility/players.js');
 
 // Read server log data from JSON file
 const fs = require('fs');
-fs.readFile('serverLog.json', 'utf8', (err, data) => {
+fs.readFile('/home/matalasg/serverLog.json', 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading server log file:', err);
         return;
