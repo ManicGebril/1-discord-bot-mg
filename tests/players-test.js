@@ -6,7 +6,7 @@ const mockInteraction = {
 };
 
 // Import the getConnectedPlayers function from players.js
-const { getConnectedPlayers } = require('../players.js');
+const { getConnectedPlayers } = require('../commands/utility/players.js');
 
 // Read server log data from JSON file
 const fs = require('fs');
