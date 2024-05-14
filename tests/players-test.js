@@ -5,14 +5,23 @@ const mockInteraction = {
     }
 };
 
-// Import the command
-const playersCommand = require('../commands/utility/players.js');
+// Import the getConnectedPlayers function from players.js
+const { getConnectedPlayers } = require('../players.js');
 
-// Invoke the command's execute function
-playersCommand.execute(mockInteraction)
-    .then(() => {
+// Read server log data from JSON file
+const fs = require('fs');
+fs.readFile('serverLog.json', 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading server log file:', err);
+        return;
+    }
+    try {
+        const serverStatus = JSON.parse(data);
+        const connectedPlayers = getConnectedPlayers(serverStatus);
+        console.log('Connected Players:', connectedPlayers);
+        console.log('Currently connected players:', connectedPlayers.join(', '));
         console.log('Command executed successfully.');
-    })
-    .catch((error) => {
-        console.error('Error executing command:', error);
-    });
+    } catch (error) {
+        console.error('Error parsing server log data:', error);
+    }
+});
