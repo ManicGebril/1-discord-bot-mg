@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 // Function to extract connected players from server status data
 function getConnectedPlayers(serverStatus) {
@@ -13,10 +14,7 @@ function getConnectedPlayers(serverStatus) {
     return Array.from(connectedPlayers);
 }
 
-// Export the getConnectedPlayers function
-module.exports = {
-    getConnectedPlayers: getConnectedPlayers
-};
+const serverLogPath = path.resolve(__dirname, '/home/matalasg/serverLog.json');
 
 // Read server log data from JSON file
 fs.readFile('serverLog.json', 'utf8', (err, data) => {
