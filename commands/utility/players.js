@@ -1,66 +1,31 @@
 const fs = require('fs');
 
+// Function to extract connected players from server status data
 function getConnectedPlayers(serverStatus) {
-    const connectedPlayers = [];
-
-    // Iterate through server status to track player's online status
+    const connectedPlayers = new Set();
     serverStatus.forEach(entry => {
-        if (entry.event === 'player_login' && entry.zdo_id && entry.zdo_id !== '0') {
-            const playerName = entry.player_name;
-            const zdoId = entry.zdo_id;
-            const existingPlayerIndex = connectedPlayers.findIndex(player => player.name === playerName);
-            if (existingPlayerIndex === -1) {
-                connectedPlayers.push({ name: playerName, zdo_id: zdoId }); // Add player to connected players with zdo_id
-                console.log(`Player ${playerName} logged in with zdo_id ${zdoId}`);
-            } else {
-                const currentZdoId = connectedPlayers[existingPlayerIndex].zdo_id;
-                if (zdoId !== currentZdoId) {
-                    console.log(`Player ${playerName} already logged in with zdo_id ${currentZdoId}, replacing with zdo_id ${zdoId}`);
-                    connectedPlayers[existingPlayerIndex].zdo_id = zdoId; // Update player's zdo_id
-                } else {
-                    console.log(`Player ${playerName} already logged in with zdo_id ${zdoId}, ignoring zdo_id ${zdoId}`);
-                }
-            }
+        if (entry.event === 'player_login' && entry.zdo_id !== '0') {
+            connectedPlayers.add(entry.zdo_id);
         } else if (entry.event === 'player_disconnect' && entry.zdo_id && entry.player_name) {
-            const playerName = entry.player_name;
-            const disconnectedZdoId = entry.zdo_id;
-            const disconnectedPlayerIndex = connectedPlayers.findIndex(player => player.name === playerName && player.zdo_id === disconnectedZdoId);
-            if (disconnectedPlayerIndex !== -1) {
-                connectedPlayers.splice(disconnectedPlayerIndex, 1); // Remove player from connected players
-                console.log(`Player ${playerName} disconnected with zdo_id ${disconnectedZdoId}`);
-            } else {
-                console.log(`Player ${playerName} disconnected with zdo_id ${disconnectedZdoId}, but was not logged in previously with this zdo_id`);
-            }
+            connectedPlayers.delete(entry.zdo_id);
         }
     });
-
-    return connectedPlayers.map(player => player.zdo_id); // Return only the zdo_ids of connected players
+    return Array.from(connectedPlayers);
 }
 
-module.exports = {
-    data: {
-        name: 'players',
-        description: 'Check the list of connected players.',
-    },
-    async execute(interaction) {
-        try {
-            const data = fs.readFileSync('/home/matalasg/serverLog.json', 'utf8');
-            console.log('Raw data from serverLog.json:', data); // log raw data
-            const serverStatus = JSON.parse(data);
-            console.log('Parsed server status:', serverStatus); // log parsed server status
-            
-            // Get currently connected players
-            const connectedPlayers = getConnectedPlayers(serverStatus);
-            console.log('Connected Players:', connectedPlayers); // log connected players
-
-            if (connectedPlayers.length === 0) {
-                await interaction.reply('There are no players currently connected.');
-            } else {
-                await interaction.reply(`Currently connected players: ${connectedPlayers.join(', ')}`);
-            }
-        } catch (error) {
-            console.error('Error reading server log data:', error);
-            await interaction.reply('Error reading server log data.');
-        }
-    },
-};
+// Read server log data from JSON file
+fs.readFile('serverLog.json', 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading server log file:', err);
+        return;
+    }
+    try {
+        const serverStatus = JSON.parse(data);
+        const connectedPlayers = getConnectedPlayers(serverStatus);
+        console.log('Connected Players:', connectedPlayers);
+        console.log('Currently connected players:', connectedPlayers.join(', '));
+        console.log('Command executed successfully.');
+    } catch (error) {
+        console.error('Error parsing server log data:', error);
+    }
+});
