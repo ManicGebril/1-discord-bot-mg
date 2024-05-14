@@ -14,10 +14,8 @@ function getConnectedPlayers(serverStatus) {
     return Array.from(connectedPlayers);
 }
 
-// Export the getConnectedPlayers function
-module.exports = {
-    getConnectedPlayers: getConnectedPlayers
-};
+// Define the path to the server log file
+const serverLogPath = path.resolve(__dirname, '/home/matalasg/serverLog.json');
 
 // Read server log data from JSON file
 fs.readFile(serverLogPath, 'utf8', (err, data) => {
@@ -35,3 +33,8 @@ fs.readFile(serverLogPath, 'utf8', (err, data) => {
         console.error('Error parsing server log data:', error);
     }
 });
+
+// Export the getConnectedPlayers function
+module.exports = {
+    getConnectedPlayers: getConnectedPlayers
+};
