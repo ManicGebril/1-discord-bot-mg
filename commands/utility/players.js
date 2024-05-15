@@ -1,3 +1,4 @@
+const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -17,24 +18,25 @@ function getConnectedPlayers(serverStatus) {
 // Define the path to the server log file
 const serverLogPath = path.resolve(__dirname, '/home/matalasg/serverLog.json');
 
-// Read server log data from JSON file
-fs.readFile(serverLogPath, 'utf8', (err, data) => {
-    if (err) {
-        console.error('Error reading server log file:', err);
-        return;
-    }
-    try {
-        const serverStatus = JSON.parse(data);
-        const connectedPlayers = getConnectedPlayers(serverStatus);
-        console.log('Connected Players:', connectedPlayers);
-        console.log('Currently connected players:', connectedPlayers.join(', '));
-        console.log('Command executed successfully.');
-    } catch (error) {
-        console.error('Error parsing server log data:', error);
-    }
-});
-
-// Export the getConnectedPlayers function
 module.exports = {
-    getConnectedPlayers: getConnectedPlayers
+    data: new SlashCommandBuilder()
+        .setName('players')
+        .setDescription('Displays the currently connected players.'),
+    async execute(interaction) {
+        fs.readFile(serverLogPath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading server log file:', err);
+                return;
+            }
+            try {
+                const serverStatus = JSON.parse(data);
+                const connectedPlayers = getConnectedPlayers(serverStatus);
+                const replyMessage = `Connected Players: ${connectedPlayers.join(', ')}`;
+                interaction.reply(replyMessage);
+            } catch (error) {
+                console.error('Error parsing server log data:', error);
+                interaction.reply('Error fetching player data.');
+            }
+        });
+    },
 };
