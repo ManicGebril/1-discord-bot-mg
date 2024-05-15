@@ -39,4 +39,5 @@ module.exports = {
             }
         });
     },
+    getConnectedPlayers,  // export the function for command test
 };
