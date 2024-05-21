@@ -38,7 +38,7 @@ module.exports = {
                 if (connectedPlayers.length > 0) {
                     replyMessage = `Connected Players: ${connectedPlayers.join(', ')}`;
                 } else {
-                    replyMessage = 'No players are currently connected.';
+                    replyMessage = 'The tenth realm is devoid of mortal essence.';
                 }
                 interaction.reply(replyMessage);
             } catch (error) {
